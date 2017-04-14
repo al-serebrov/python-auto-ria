@@ -60,38 +60,47 @@ def select_item(item_to_select, items_list):
         return None
 
 
-def compose_parameters(search_parameters):
+def get_average(category, mark, model, bodystyle=None,
+                year_start=None, year_end=None, state=None):
     """Compose parameters for GET request."""
+    """Get average price using search parameters.
+
+    Returns processed search parameters, generated url,
+    and JSON response from the server
+    """
     params_dict = {}
     years_list = []
 
     categories_list = get_categories()
-    category = select_item(search_parameters['VEHICLE_TYPE'], categories_list)
-    params_dict['main_category'] = category
+    selected_category = select_item(category, categories_list)
+    params_dict['main_category'] = selected_category
 
-    bodystyles_list = get_bodystyles(category)
-    bodystyle = select_item(search_parameters['VEHICLE_BODY'], bodystyles_list)
-    params_dict['body_id'] = bodystyle
+    bodystyles_list = get_bodystyles(selected_category)
+    selected_bodystyle = select_item(bodystyle, bodystyles_list)
+    params_dict['body_id'] = selected_bodystyle
 
-    marks_list = get_marks(category)
-    mark = select_item(search_parameters['VEHICLE_MARK'], marks_list)
-    params_dict['marka_id'] = mark
+    marks_list = get_marks(selected_category)
+    selected_mark = select_item(mark, marks_list)
+    params_dict['marka_id'] = selected_mark
 
-    models_list = get_models(category, mark)
-    model = select_item(search_parameters['VEHICLE_MODEL'], models_list)
-    params_dict['model_id'] = model
+    models_list = get_models(selected_category, selected_mark)
+    selected_model = select_item(model, models_list)
+    params_dict['model_id'] = selected_model
 
     states_list = get_states()
-    state = select_item(search_parameters['VEHICLE_REGION'], states_list)
-    params_dict['state_id'] = state
+    selected_state = select_item(state, states_list)
+    params_dict['state_id'] = selected_state
 
-    vehicle_year_start = search_parameters['VEHICLE_YEAR_START']
-    vehicle_year_end = search_parameters['VEHICLE_YEAR_END']
-    years_list.append(vehicle_year_start)
-    years_list.append(vehicle_year_end)
+    years_list.append(year_start)
+    years_list.append(year_end)
     params_dict['yers'] = years_list
 
-    return params_dict
+    url = 'http://api.auto.ria.com/average'
+    # Senging GET request
+    response = requests.get(url, params=params_dict)
+    # Formatiing response into JSON for convenience
+    average = json.loads(response.text)
+    return [params_dict, response.url, average]
 
 """
     The following parameters are not in use right now.
@@ -114,19 +123,3 @@ def compose_parameters(search_parameters):
     'confiscated': 'confiscated_car',
     'on_repairment': 'onRepairParts',
 """
-
-
-def get_average(search_parameters):
-    """Get average price using search parameters.
-
-    Returns processed search parameters, generated url,
-    and JSON response from the server
-    """
-    url = 'http://api.auto.ria.com/average'
-    # Composing parameters
-    params = compose_parameters(search_parameters)
-    # Senging GET request
-    response = requests.get(url, params=params)
-    # Formatiing response into JSON for convenience
-    average = json.loads(response.text)
-    return [params, response.url, average]
