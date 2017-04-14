@@ -14,8 +14,7 @@ CATEGORY = 'Легковые'
 MARK = 'Renaul'
 MODEL = 'Scenic'
 BODY = None
-YEAR_START = 2005
-YEAR_END = 2006
+YEARS_START_END = [2005, 2006]
 REGION = None
 # not implemented yet
 # VEHICLE_MIN_PRICE = '4000'
@@ -26,8 +25,7 @@ results = get_average(category=CATEGORY,
                       mark=MARK,
                       model=MODEL,
                       bodystyle=BODY,
-                      year_start=YEAR_START,
-                      year_end=YEAR_END,
+                      years_start_end=YEARS_START_END,
                       state=REGION
                       )
 
