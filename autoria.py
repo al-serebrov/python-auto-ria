@@ -207,7 +207,7 @@ class RiaAPI:
         """Get available colors from auto.ria.com.
 
         Returns:
-            The list of dictionaries with options like:
+            The list of dictionaries with colors like:
             [
                 {
                 name: "Бежевый",
@@ -257,7 +257,8 @@ class RiaAverageCarPrice:
 
     def __init__(self, category: str, mark: str, model: str,
                  bodystyle: str = None, years: list = None,
-                 state: str = None, gears: list = None) -> Union[dict, list]:
+                 state: str = None, gears: list = None,
+                 opts: list = None) -> Union[dict, list]:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
@@ -330,6 +331,10 @@ class RiaAverageCarPrice:
         # Creating a list of gearbox ids
         gearboxes = self._api.get_gearboxes(selected_category)
         self._params['gear_id'] = select_list(gears, gearboxes)
+
+        # Creatin a list of option ids
+        options = self._api.get_options(selected_category)
+        self._params['options'] = select_list(opts, options)
 
     def get_average(self) -> Union[dict, list]:
         """Get average price for composed search parameters."""

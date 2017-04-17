@@ -21,8 +21,8 @@ myCarAveragePrice = RiaAverageCarPrice(
     # bodystyle=None,
     years=[2006, ],
     # state=None,
-    gears=['Автомат'],
-    # options=['ABS', 'ABD']
+    gears=['Механика'],
+    opts=['ABS']
 )
 
 pprint(myCarAveragePrice.get_average())
