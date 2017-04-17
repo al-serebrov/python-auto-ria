@@ -5,7 +5,7 @@ average used car prices that are sold on http://auto.ria.com
 """
 
 from pprint import pprint
-from autoria import get_average
+from autoria import RiaAPI
 
 # not implemented yet
 # VEHICLE_MIN_PRICE = '4000'
@@ -13,12 +13,15 @@ from autoria import get_average
 
 # Type, mark and model are required parameters
 # the rest of them is optional
-results = get_average(category='Легковые',
-                      mark='Renault',
-                      model='Scenic',
-                      bodystyle=None,
-                      years=[2005, 2006],
-                      state=None
-                      )
+
+api = RiaAPI()
+
+results = api.get_average(category='Легковые',
+                          mark='Renault',
+                          model='Scenic',
+                          bodystyle=None,
+                          years=[2014, ],
+                          state=None
+                          )
 
 pprint(results)
