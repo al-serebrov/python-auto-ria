@@ -8,14 +8,14 @@ average used car prices that are sold on http://auto.ria.com
 import requests
 import json
 from fnmatch import fnmatch
+from typing import Union
 
 
-def make_request(url: str) -> json:
+def make_request(url: str) -> Union[dict, list]:
     """Send get request and return data in JSON.
 
     Args:
-        url - string with url returning needed
-        data (categories, bodystyles etc.)
+        url - string with url returning needed data
 
     Returns:
         JSON-formatted response text.
@@ -27,13 +27,11 @@ def make_request(url: str) -> json:
         print('Ups! Something went wrong in processing of {}'.format(url))
 
 
-def get_categories() -> json:
+def get_categories() -> Union[dict, list]:
     """Get available vehicle types from auto.ria.com.
 
-    No args needed because the list has fixed url.
-
     Returns:
-        JSON-formatted list of pairs ''name: value'' like:
+        The list of dictionaries with categories like:
         [
             {
             "name": "Легковые",
@@ -46,13 +44,13 @@ def get_categories() -> json:
     return make_request(url)
 
 
-def get_bodystyles(category: int) -> json:
+def get_bodystyles(category: int) -> Union[dict, list]:
     """Get available bodystyles from auto.ria.com.
 
     Args:
-        category - integer with needed category id.
+        category - needed category id.
     Returns:
-        JSON-formatted list of pairs ''name: value'' like:
+        The list of dictionaries with bodystyle information like:
         [
             {
             "name": "Седан",
@@ -66,14 +64,14 @@ def get_bodystyles(category: int) -> json:
     return make_request(url)
 
 
-def get_marks(category: int) -> json:
+def get_marks(category: int) -> Union[dict, list]:
     """Get available car marks from auto.ria.com.
 
     Args:
-        category - integer with needed category id.
+        category - needed category id.
 
     Returns:
-        JSON-formatted list of pairs ''name: value'' like:
+        The list of dictionaries with marks information like:
         [
             {
             "name": "Acura",
@@ -87,16 +85,15 @@ def get_marks(category: int) -> json:
     return make_request(url)
 
 
-def get_models(category: int, mark: int) -> json:
+def get_models(category: int, mark: int) -> Union[dict, list]:
     """Get available models for selected mark from auto.ria.com.
 
     Args:
-        category - integer with needed category id.
-        mark - integer with needed mark id
-            (since we're getting models of the mark)
+        category - needed category id.
+        mark - needed mark id (since we're getting models of the mark)
 
     Returns:
-        JSON-formatted list of pairs ''name: value'' like:
+        The list of dictionaries with models like:
         [
             {
             "name": "CL",
@@ -110,13 +107,11 @@ def get_models(category: int, mark: int) -> json:
     return make_request(url)
 
 
-def get_states() -> json:
+def get_states() -> Union[dict, list]:
     """Get available states from auto.ria.com.
 
-    Args aren't needed because the url is fixed.
-
     Returns:
-        JSON-formatted list of pair ''name: value'' like:
+        The list of dictionaries with states like:
         [
             {
             "name": "Винницкая",
@@ -129,7 +124,7 @@ def get_states() -> json:
     return make_request(url)
 
 
-def select_item(item_to_select: str, items_list: json) -> int:
+def select_item(item_to_select: str, items_list: dict) -> int:
     """Select vehicle type, bodystyle, mark, model from the given list.
 
     This function is intended to convert human-readable search parameter,
@@ -139,7 +134,7 @@ def select_item(item_to_select: str, items_list: json) -> int:
     Args:
         item_to_select - string, could be not 100% accurate as it is in the
             auto.ria.ua lists, e.g. value ''Харьков'' is acceptable,
-            because the parameter is wildcarted in comprasion like
+            because the parameter is wild-carded in comprasion like
             ''*Харьков*'', the function will find suitable name
             ''Харьковская'' and will return its id.
         items_list - JSON-formatted list of pairs ''name: value'',
@@ -157,24 +152,24 @@ def select_item(item_to_select: str, items_list: json) -> int:
 
 
 def get_average(category: str, mark: str, model: str, bodystyle: str = None,
-                years_start_end: list = None, state: str = None) -> json:
+                years: list = None, state: str = None) \
+        -> Union[dict, list]:
     """Compose parameters for GET request and send it.
 
     Get average price using search parameters.
 
     Args:
-        category - (required) string with vehicle type,
-                   e.g. ''Легковые''
-        mark - (required) string with mark, like ''Renault''
-        model - (requred) sting with model, like ''Scenic''
-        bodystyle - (optional) string with bodystyle, e.g. ''Седан''
-        year_start_end - (optional) list with start and end mfr year,
-                        e.g. ''[2005, 2006]'', also one of years could be
-                        ''None'', e.g. ''[2005, None]''
+        category - vehicle type, e.g. ''Легковые''
+        mark - mark, like ''Renault''
+        model - model, like ''Scenic''
+        bodystyle - (optional) bodystyle, e.g. ''Седан''
+        year - (optional) list with start and end manufacturing year,
+               e.g. ''[2005, 2006]'', also one of years could be
+               ''None'', e.g. ''[2005, None]''
             <== note: make this parameter behave like on auto.ria: if there's
             only start year end=current_year, vice versa - start=1950==>
-        state - (optional) string with state (city), e.g. ''Харьков''
-        ******************************************************************
+        state - (optional) state (city), e.g. ''Харьков''
+
         The following search parameters are not in use right now.
         Are to be added.
         gear_type - (optional) list with gearshift types,
@@ -197,11 +192,26 @@ def get_average(category: str, mark: str, model: str, bodystyle: str = None,
         'credit': 'under_credit',
         'confiscated': 'confiscated_car',
         'on_repairment': 'onRepairParts',
-        ******************************************************************
+
 
         Returns:
             JSON-formatted output with data as described here:
             https://goo.gl/WVCVi8
+            An example:
+            {'arithmeticMean': 6142.471428571429,
+             'classifieds': [19365865,
+                             17441252,
+                             ...
+                             ],
+             'interQuartileMean': 6749.941176470588,
+             'percentiles': {'1.0': 2591.3759999999997,
+                             '5.0': 2735,
+                             ...
+                             '99.0': 8236.5},
+             'prices': [3300,
+                        3500,
+                        ...],
+             'total': 28}
     """
     params_dict = {}
 
@@ -231,7 +241,7 @@ def get_average(category: str, mark: str, model: str, bodystyle: str = None,
     params_dict['state_id'] = selected_state
 
     # Creting a list from start and end years
-    params_dict['yers'] = years_start_end
+    params_dict['yers'] = years
 
     # Getting average price
     url = 'http://api.auto.ria.com/average'
@@ -239,4 +249,5 @@ def get_average(category: str, mark: str, model: str, bodystyle: str = None,
     response = requests.get(url, params=params_dict)
     # Formatiing response into JSON for convenience
     average = json.loads(response.text)
-    return [params_dict, response.url, average]
+    print('{}\n{}'.format(params_dict, response.url))
+    return average
