@@ -276,8 +276,10 @@ class RiaAverageCarPrice:
                 if there's only start year end=current_year,
                 vice versa - start=1950==>
             state - (optional) state (city), e.g. ''Харьков''
-            gear_id - (optional) list with gearshift types,
+            gears - (optional) list with gearshift types,
                         e.g. ['Ручная', 'Автомат']
+            opts - (optional) list with neede options, like
+                ['ABS', 'ABD']
 
         The following search parameters are not in use right now.
         Are to be added.
@@ -286,7 +288,6 @@ class RiaAverageCarPrice:
         drive - (optional) list with drive types,
                 e.g. ''[Передний, Полный]''
         'engine': 'engineVolume',
-        'options': 'options',
         'mileage': 'raceInt',
         'doors': 'door',
         'state': 'state_id',
@@ -332,7 +333,7 @@ class RiaAverageCarPrice:
         gearboxes = self._api.get_gearboxes(selected_category)
         self._params['gear_id'] = select_list(gears, gearboxes)
 
-        # Creatin a list of option ids
+        # Creating a list of option ids
         options = self._api.get_options(selected_category)
         self._params['options'] = select_list(opts, options)
 
