@@ -258,7 +258,7 @@ class RiaAverageCarPrice:
     def __init__(self, category: str, mark: str, model: str,
                  bodystyle: str = None, years: list = None,
                  state: str = None, gears: list = None,
-                 opts: list = None) -> Union[dict, list]:
+                 opts: list = None, mileage: list = None) -> Union[dict, list]:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
@@ -280,6 +280,8 @@ class RiaAverageCarPrice:
                         e.g. ['Ручная', 'Автомат']
             opts - (optional) list with neede options, like
                 ['ABS', 'ABD']
+            mileage - (optionsl) list with start and end mileage, e.g.:
+                [10, 100]
 
         The following search parameters are not in use right now.
         Are to be added.
@@ -288,7 +290,6 @@ class RiaAverageCarPrice:
         drive - (optional) list with drive types,
                 e.g. ''[Передний, Полный]''
         'engine': 'engineVolume',
-        'mileage': 'raceInt',
         'doors': 'door',
         'state': 'state_id',
         'city': 'city_id',
@@ -328,6 +329,9 @@ class RiaAverageCarPrice:
 
         # Creating a list from start and end years
         self._params['yers'] = years
+
+        # Adding a list of milage to params
+        self._params['raceInt'] = mileage
 
         # Creating a list of gearbox ids
         gearboxes = self._api.get_gearboxes(selected_category)
