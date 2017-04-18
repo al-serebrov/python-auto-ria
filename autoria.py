@@ -37,6 +37,7 @@ class RiaAPI:
         req_url = self._api_url.format(method=url)
         response = requests.get(url=req_url, params=parameters)
         if response.status_code == 200:
+            print(response.url)
             return json.loads(response.text)
         else:
             raise Exception(
