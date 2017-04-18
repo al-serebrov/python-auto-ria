@@ -21,10 +21,10 @@ class RiaAPI:
 
     def __init__(self):
         """Constructor."""
-        self._base_url = 'http://api.auto.ria.com'
+        self._api_url = 'http://api.auto.ria.com/{method}'
 
-    def _make_request(self, url: str, parameters: dict = None) \
-            -> Union[dict, list]:
+    def _make_request(
+            self, url: str, parameters: dict = None) -> Union[dict, list]:
         """Send get request and return data in JSON.
 
         Args:
@@ -32,9 +32,9 @@ class RiaAPI:
             parameters - request GET parameters (if any)
 
         Returns:
-            Dictionary with response text.
+            List of dictionaries with response text.
         """
-        req_url = self._base_url + url
+        req_url = self._api_url.format(method=url)
         response = requests.get(url=req_url, params=parameters)
         if response.status_code == 200:
             return json.loads(response.text)

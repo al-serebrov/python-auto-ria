@@ -2,6 +2,16 @@
 
 Python implementation of API intended for calulating
 average used car prices that are sold on http://auto.ria.com
+
+Sample API usage:
+categories = api.get_categories()
+cars_category = select_item('Легковые', categories)
+print(api.get_gearboxes(cars_category))
+print(api.get_driver_types(cars_category))
+print(api.get_options(cars_category))
+
+print(api.get_fuels())
+print(api.get_colors())
 """
 
 from pprint import pprint
@@ -27,15 +37,3 @@ myCarAveragePrice = RiaAverageCarPrice(
 )
 
 pprint(myCarAveragePrice.get_average())
-
-"""
-Sample API usage:
-categories = api.get_categories()
-cars_category = select_item('Легковые', categories)
-print(api.get_gearboxes(cars_category))
-print(api.get_driver_types(cars_category))
-print(api.get_options(cars_category))
-
-print(api.get_fuels())
-print(api.get_colors())
-"""
