@@ -8,7 +8,7 @@ average used car prices that are sold on http://auto.ria.com
 import requests
 import json
 from fnmatch import fnmatch
-from typing import Union
+from typing import Any, Dict, List
 
 
 class RiaAPI:
@@ -24,7 +24,7 @@ class RiaAPI:
         self._api_url = 'http://api.auto.ria.com{method}'
 
     def _make_request(
-            self, url: str, parameters: dict = None) -> Union[dict, list]:
+            self, url: str, parameters: dict = None) -> Any:
         """Send get request and return data in JSON.
 
         Args:
@@ -44,7 +44,7 @@ class RiaAPI:
                 'Error making a request to: {}, response: {}, {}'
                 .format(url, response.status_code, response.text))
 
-    def get_categories(self) -> Union[dict, list]:
+    def get_categories(self) -> List[Dict[str, Any]]:
         """Get available vehicle types from auto.ria.com.
 
         Returns:
@@ -59,7 +59,7 @@ class RiaAPI:
         """
         return self._make_request('/categories')
 
-    def get_bodystyles(self, category: int) -> Union[dict, list]:
+    def get_bodystyles(self, category: int) -> List[Dict[str, Any]]:
         """Get available bodystyles from auto.ria.com.
 
         Args:
@@ -77,7 +77,7 @@ class RiaAPI:
         url = '/categories/{}/bodystyles'.format(str(category))
         return self._make_request(url)
 
-    def get_marks(self, category: int) -> Union[dict, list]:
+    def get_marks(self, category: int) -> List[Any]:
         """Get available car marks from auto.ria.com.
 
         Args:
@@ -96,7 +96,7 @@ class RiaAPI:
         url = '/categories/{}/marks'.format(str(category))
         return self._make_request(url)
 
-    def get_models(self, category: int, mark: int) -> Union[dict, list]:
+    def get_models(self, category: int, mark: int) -> List[Dict[str, Any]]:
         """Get available models for selected mark from auto.ria.com.
 
         Args:
@@ -116,7 +116,7 @@ class RiaAPI:
         url = '/categories/{}/marks/{}/models'.format(str(category), str(mark))
         return self._make_request(url)
 
-    def get_states(self) -> Union[dict, list]:
+    def get_states(self) -> List[Dict[str, Any]]:
         """Get available states from auto.ria.com.
 
         Returns:
@@ -131,7 +131,7 @@ class RiaAPI:
         """
         return self._make_request('/states')
 
-    def get_cities(self, state: int) -> Union[dict, list]:
+    def get_cities(self, state: int) -> List[Dict[str, Any]]:
         """Get the list of cities for selected state.
 
         Args:
@@ -155,7 +155,7 @@ class RiaAPI:
         url = '/states/{}/cities'.format(str(state))
         return self._make_request(url)
 
-    def get_gearboxes(self, category):
+    def get_gearboxes(self, category: int) -> List[Dict[str, Any]]:
         """Get available gearbox types from auto.ria.com.
 
         Args:
@@ -174,7 +174,7 @@ class RiaAPI:
         url = '/categories/{}/gearboxes'.format(str(category))
         return self._make_request(url)
 
-    def get_driver_types(self, category):
+    def get_driver_types(self, category: int) -> List[Dict[str, Any]]:
         """Get available drive types from auto.ria.com.
 
         Args:
@@ -194,7 +194,7 @@ class RiaAPI:
         url = '/categories/{}/driverTypes'.format(category)
         return self._make_request(url)
 
-    def get_fuels(self):
+    def get_fuels(self) -> List[Dict[str, Any]]:
         """Get available fuel types from auto.ria.com.
 
         Returns:
@@ -209,7 +209,7 @@ class RiaAPI:
         """
         return self._make_request('/fuels')
 
-    def get_options(self, category):
+    def get_options(self, category: int) -> List[Dict[str, Any]]:
         """Get available options from auto.ria.com.
 
         Args:
@@ -228,7 +228,7 @@ class RiaAPI:
         url = '/categories/{}/options'.format(str(category))
         return self._make_request(url)
 
-    def get_colors(self):
+    def get_colors(self) -> List[Dict[str, Any]]:
         """Get available colors from auto.ria.com.
 
         Returns:
@@ -243,7 +243,7 @@ class RiaAPI:
         """
         return self._make_request('/colors')
 
-    def average_price(self, parameters: dict) -> Union[dict, list]:
+    def average_price(self, parameters: dict) -> dict:
         """Make an API request for average price.
 
         Args:
@@ -291,7 +291,7 @@ class RiaAverageCarPrice:
                  carrying: int = None, custom: int = None,
                  damage: int = None, under_credit: int = None,
                  confiscated: int = None, on_repair_parts: int = None
-                 ) -> Union[dict, list]:
+                 ) -> None:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
@@ -374,12 +374,12 @@ class RiaAverageCarPrice:
             'onRepairParts': on_repair_parts,
         }
 
-    def get_average(self) -> Union[dict, list]:
+    def get_average(self) -> dict:
         """Get average price for composed search parameters."""
         return self._api.average_price(self._params)
 
 
-def select_item(item_to_select: str, items_list: dict) -> int:
+def select_item(item_to_select: str, items_list: list) -> int:
         """Select vehicle type, bodystyle, mark, model from the given list.
 
         This function is intended to convert human-readable search
@@ -406,7 +406,7 @@ def select_item(item_to_select: str, items_list: dict) -> int:
             return None
 
 
-def select_list(list_to_select: list, items_list: dict) -> list:
+def select_list(list_to_select: list, items_list: list) -> list:
     """Select a list of ids in the list of dictionaries.
 
     The function is intended to select a list of options inside
