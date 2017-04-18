@@ -21,7 +21,7 @@ class RiaAPI:
 
     def __init__(self):
         """Constructor."""
-        self._api_url = 'http://api.auto.ria.com/{method}'
+        self._api_url = 'http://api.auto.ria.com{method}'
 
     def _make_request(
             self, url: str, parameters: dict = None) -> Union[dict, list]:
@@ -190,7 +190,7 @@ class RiaAPI:
             ]
 
         """
-        url = '/categories/{}/driverTypes'
+        url = '/categories/{}/driverTypes'.format(category)
         return self._make_request(url)
 
     def get_fuels(self):
@@ -284,7 +284,8 @@ class RiaAverageCarPrice:
                  state: str = None, city: str = None,
                  gears: list = None, opts: list = None,
                  mileage: list = None, fuels: list = None,
-                 drives: list = None, color: str = None) -> Union[dict, list]:
+                 drives: list = None, color: str = None,
+                 engineVolume: float = None) -> Union[dict, list]:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
@@ -298,9 +299,6 @@ class RiaAverageCarPrice:
             year - (optional) list with start and end manufacturing year,
                    e.g. ''[2005, 2006]'', also one of years could be
                    ''None'', e.g. ''[2005, None]''
-                <== note: make this parameter behave like on auto.ria:
-                if there's only start year end=current_year,
-                vice versa - start=1950==>
             state - (optional) state, e.g. ''Харьковская''
             city - (optional) city inside of state, e.g. ''Харьков'', if
                 the state is not selected (state=None), city won't be
@@ -316,10 +314,10 @@ class RiaAverageCarPrice:
             drives - (optional) list with drive types,
                     e.g. ''[Передний, Полный]''
             color - (optional) car color like ''Бежевый''
+            engineVolume - (optional) e.g. 1.5
 
         The following search parameters are not in use right now.
         Are to be added.
-        'engine': 'engineVolume',
         'doors': 'door',
         'carrying': 'carrying',
         'seats': 'seats',
@@ -360,7 +358,8 @@ class RiaAverageCarPrice:
                 drives,
                 self._api.get_driver_types(category_id)
             ),
-            'color_id': select_item(color, self._api.get_colors())
+            'color_id': select_item(color, self._api.get_colors()),
+            'engineVolume': engineVolume,
         }
 
     def get_average(self) -> Union[dict, list]:

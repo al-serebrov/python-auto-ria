@@ -29,7 +29,7 @@ myCarAveragePrice = RiaAverageCarPrice(
     mark='Renault',
     model='Scenic RX4',
     # bodystyle=None,
-    years=[2002, 2006],
+    years=[2006, 2007],
     # state='Харьковская',
     # city='Харьков',
     gears=['Механика'],
@@ -37,7 +37,8 @@ myCarAveragePrice = RiaAverageCarPrice(
     # mileage=[10, 200],
     fuels=['Дизель'],
     drives=['Полный'],
-    color='Серый'
+    color='Серый',
+    engineVolume=1.5
 )
 
 pprint(myCarAveragePrice.get_average())
