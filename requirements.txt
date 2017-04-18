@@ -1,0 +1,11 @@
+requests
+typing # backported python type hints library
+pytest
+pytest-cov
+pytest-greendots
+coverage
+flake8 # lint Python
+pylint
+mypy
+requests_mock # create mocks for ``requests``
+pytest-catchlog # Capture logging for tests
