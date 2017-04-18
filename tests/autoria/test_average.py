@@ -11,7 +11,7 @@ class TestAverage:
                              ria_bodystyles, ria_models, ria_cities,
                              ria_gearboxes, ria_options, ria_fuels,
                              ria_driver_types, ria_colors, ria_average):
-        """Test average car price calculation."""
+        """Car price can be calculated with minimal set of parameters."""
         with requests_mock.Mocker() as mock:
             mock.get('/categories',
                      text=json.dumps(ria_categories))
