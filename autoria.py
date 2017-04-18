@@ -283,7 +283,8 @@ class RiaAverageCarPrice:
                  bodystyle: str = None, years: list = None,
                  state: str = None, city: str = None,
                  gears: list = None, opts: list = None,
-                 mileage: list = None) -> Union[dict, list]:
+                 mileage: list = None, fuels: list = None,
+                 drives: list = None) -> Union[dict, list]:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
@@ -310,13 +311,13 @@ class RiaAverageCarPrice:
                 ['ABS', 'ABD']
             mileage - (optionsl) list with start and end mileage, e.g.:
                 [10, 100]
+            fuels - (optional) list with gasoline types,
+                    e.g. ''[Бензин, Газ/Бензин]''
+            driveы - (optional) list with drive types,
+                    e.g. ''[Передний, Полный]''
 
         The following search parameters are not in use right now.
         Are to be added.
-        fuel - (optional) list with gasoline types,
-                e.g. ''[Бензин, Газ/Бензин]''
-        drive - (optional) list with drive types,
-                e.g. ''[Передний, Полный]''
         'engine': 'engineVolume',
         'doors': 'door',
         'state': 'state_id',
@@ -356,6 +357,11 @@ class RiaAverageCarPrice:
                 self._api.get_gearboxes(category_id)
             ),
             'options': select_list(opts, self._api.get_options(category_id)),
+            'fuel_id': select_list(fuels, self._api.get_fuels()),
+            'drive_id': select_list(
+                drives,
+                self._api.get_driver_types(category_id)
+            )
         }
 
     def get_average(self) -> Union[dict, list]:

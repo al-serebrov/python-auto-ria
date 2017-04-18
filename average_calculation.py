@@ -27,14 +27,16 @@ api = RiaAPI()
 myCarAveragePrice = RiaAverageCarPrice(
     category='Легковые',
     mark='Renault',
-    model='Scenic',
+    model='Scenic RX4',
     # bodystyle=None,
-    years=[2006, ],
+    years=[2002, 2006],
     # state='Харьковская',
     # city='Харьков',
     gears=['Механика'],
-    opts=['ABS'],
-    mileage=[10, 200],
+    # opts=['ABS'],
+    # mileage=[10, 200],
+    fuels=['Дизель'],
+    drives=['Полный']
 )
 
 pprint(myCarAveragePrice.get_average())
