@@ -399,11 +399,26 @@ def select_item(item_to_select: str, items_list: dict) -> int:
             needed item (category, bodystyle, mark etc.) identifyer.
         """
         if item_to_select is not None and items_list is not None:
+            result = None
             for item in items_list:
-                if fnmatch(item['name'], '*' + item_to_select + '*'):
-                    return item['value']
-        else:
-            return None
+                if fnmatch(item['name'], item_to_select):
+                    result = item['value']
+                    print(result)
+                    return result
+            if result is None:
+                for item in items_list:
+                    if fnmatch(item['name'], '{}*'.format(item_to_select)):
+                        print('yep')
+                        result = item['value']
+                        print(result)
+                        return result
+            if result is None:
+                for item in items_list:
+                    if fnmatch(item['name'], '*{}*'.format(item_to_select)):
+                        print('heyo')
+                        result = item['value']
+                        print(result)
+                        return(result)
 
 
 def select_list(list_to_select: list, items_list: dict) -> list:
