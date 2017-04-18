@@ -285,7 +285,12 @@ class RiaAverageCarPrice:
                  gears: list = None, opts: list = None,
                  mileage: list = None, fuels: list = None,
                  drives: list = None, color: str = None,
-                 engineVolume: float = None) -> Union[dict, list]:
+                 engine_volume: float = None,
+                 seats: int = None, doors: int = None,
+                 carrying: int = None, custom: int = None,
+                 damage: int = None, under_credit: int = None,
+                 confiscated: int = None, on_repair_parts: int = None
+                 ) -> Union[dict, list]:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
@@ -295,37 +300,35 @@ class RiaAverageCarPrice:
             category - vehicle type, e.g. ''Легковые''
             mark - mark, like ''Renault''
             model - model, like ''Scenic''
-            bodystyle - (optional) bodystyle, e.g. ''Седан''
-            year - (optional) list with start and end manufacturing year,
+        All following args are optional:
+            bodystyle - bodystyle, e.g. ''Седан''
+            year - list with start and end manufacturing year,
                    e.g. ''[2005, 2006]'', also one of years could be
                    ''None'', e.g. ''[2005, None]''
-            state - (optional) state, e.g. ''Харьковская''
-            city - (optional) city inside of state, e.g. ''Харьков'', if
+            state - state, e.g. ''Харьковская''
+            city - city inside of state, e.g. ''Харьков'', if
                 the state is not selected (state=None), city won't be
                 selected too, and won't have any influence on search results
-            gears - (optional) list with gearshift types,
+            gears - list with gearshift types,
                         e.g. ['Ручная', 'Автомат']
-            opts - (optional) list with neede options, like
+            opts - list with neede options, like
                 ['ABS', 'ABD']
-            mileage - (optionsl) list with start and end mileage, e.g.:
+            mileage - list with start and end mileage, e.g.:
                 [10, 100]
-            fuels - (optional) list with gasoline types,
+            fuels - list with gasoline types,
                     e.g. ''[Бензин, Газ/Бензин]''
-            drives - (optional) list with drive types,
+            drives - list with drive types,
                     e.g. ''[Передний, Полный]''
-            color - (optional) car color like ''Бежевый''
+            color - car color like ''Бежевый''
             engineVolume - (optional) e.g. 1.5
-
-        The following search parameters are not in use right now.
-        Are to be added.
-        'doors': 'door',
-        'carrying': 'carrying',
-        'seats': 'seats',
-        'custom': 'custom',
-        'damage': 'damage',
-        'credit': 'under_credit',
-        'confiscated': 'confiscated_car',
-        'on_repairment': 'onRepairParts',
+            seats - (quantity of seats, e.g. 5
+            doors - quantity of doors, e.g. 3
+            carrying - how much is the car able to carry, e.g. 1500
+            custom - is custom clearance needed for the car? 1 - YES, 0 - NO
+            damage - is the car damaged in car accident? 1 - YES, 0 - NO
+            credit - is the car under credit? 1 - YES, 0 - NO
+            confiscated - is the car confiscated? 1 - YES, 0 - NO
+            on_repair_parts - is the car is broken? 1 - YES, 0 - NO
         """
         self._api = RiaAPI()
         # Getting list of categories and selecting needed id
@@ -359,7 +362,15 @@ class RiaAverageCarPrice:
                 self._api.get_driver_types(category_id)
             ),
             'color_id': select_item(color, self._api.get_colors()),
-            'engineVolume': engineVolume,
+            'engineVolume': engine_volume,
+            'seats': seats,
+            'door': doors,
+            'carrying': carrying,
+            'custom': custom,
+            'damage': damage,
+            'under_credit': under_credit,
+            'confiscated_car': confiscated,
+            'onRepairParts': on_repair_parts,
         }
 
     def get_average(self) -> Union[dict, list]:
