@@ -36,7 +36,8 @@ myCarAveragePrice = RiaAverageCarPrice(
     # opts=['ABS'],
     # mileage=[10, 200],
     fuels=['Дизель'],
-    drives=['Полный']
+    drives=['Полный'],
+    color='Серый'
 )
 
 pprint(myCarAveragePrice.get_average())
