@@ -303,43 +303,30 @@ class RiaAverageCarPrice:
         'on_repairment': 'onRepairParts',
         """
         self._api = RiaAPI()
-        self._params = {}
-
         # Getting list of categories and selecting needed id
-        categories_list = self._api.get_categories()
-        selected_category = select_item(category, categories_list)
-        self._params['main_category'] = selected_category
+        category_id = select_item(category, self._api.get_categories())
+        mark_id = select_item(mark, self._api.get_marks(category_id))
 
-        # Getting list of bodysyles and selecting needed id
-        bodystyles_list = self._api.get_bodystyles(selected_category)
-        self._params['body_id'] = select_item(bodystyle, bodystyles_list)
-
-        # Getting list of marks and selecting needed id
-        marks_list = self._api.get_marks(selected_category)
-        selected_mark = select_item(mark, marks_list)
-        self._params['marka_id'] = selected_mark
-
-        # Getting list of models and selecting needed id
-        models_list = self._api.get_models(selected_category, selected_mark)
-        self._params['model_id'] = select_item(model, models_list)
-
-        # Getting list of states and selecting needed id
-        states_list = self._api.get_states()
-        self._params['state_id'] = select_item(state, states_list)
-
-        # Creating a list from start and end years
-        self._params['yers'] = years
-
-        # Adding a list of milage to params
-        self._params['raceInt'] = mileage
-
-        # Creating a list of gearbox ids
-        gearboxes = self._api.get_gearboxes(selected_category)
-        self._params['gear_id'] = select_list(gears, gearboxes)
-
-        # Creating a list of option ids
-        options = self._api.get_options(selected_category)
-        self._params['options'] = select_list(opts, options)
+        self._params = {
+            'main_category': category_id,
+            'body_id': select_item(
+                bodystyle,
+                self._api.get_bodystyles(category_id)
+            ),
+            'marka_id': mark_id,
+            'model_id': select_item(
+                model,
+                self._api.get_models(category_id, mark_id)
+            ),
+            'state_id': select_item(state, self._api.get_states()),
+            'yers': years,
+            'raceInt': mileage,
+            'gear_id': select_list(
+                gears,
+                self._api.get_gearboxes(category_id)
+            ),
+            'options': select_list(opts, self._api.get_options(category_id)),
+        }
 
     def get_average(self) -> Union[dict, list]:
         """Get average price for composed search parameters."""
