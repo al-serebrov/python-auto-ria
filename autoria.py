@@ -130,6 +130,30 @@ class RiaAPI:
         """
         return self._make_request('/states')
 
+    def get_cities(self, state: int) -> Union[dict, list]:
+        """Get the list of cities for selected state.
+
+        Args:
+            state - identifier with selected state id.
+
+        Returns:
+            The list of dictionaries with cities of the selected
+            state. E.g. if we pass 1 (Vinnitsa state) the result is:
+            [
+                {
+                name: "Винница",
+                value: 1
+                },
+                {
+                name: "Жмеринка",
+                value: 27
+                },
+                ...
+            ]
+        """
+        url = '/states/{}/cities'.format(str(state))
+        return self._make_request(url)
+
     def get_gearboxes(self, category):
         """Get available gearbox types from auto.ria.com.
 
@@ -257,8 +281,9 @@ class RiaAverageCarPrice:
 
     def __init__(self, category: str, mark: str, model: str,
                  bodystyle: str = None, years: list = None,
-                 state: str = None, gears: list = None,
-                 opts: list = None, mileage: list = None) -> Union[dict, list]:
+                 state: str = None, city: str = None,
+                 gears: list = None, opts: list = None,
+                 mileage: list = None) -> Union[dict, list]:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
@@ -275,7 +300,10 @@ class RiaAverageCarPrice:
                 <== note: make this parameter behave like on auto.ria:
                 if there's only start year end=current_year,
                 vice versa - start=1950==>
-            state - (optional) state (city), e.g. ''Харьков''
+            state - (optional) state, e.g. ''Харьковская''
+            city - (optional) city inside of state, e.g. ''Харьков'', if
+                the state is not selected (state=None), city won't be
+                selected too, and won't have any influence on search results
             gears - (optional) list with gearshift types,
                         e.g. ['Ручная', 'Автомат']
             opts - (optional) list with neede options, like
@@ -306,6 +334,7 @@ class RiaAverageCarPrice:
         # Getting list of categories and selecting needed id
         category_id = select_item(category, self._api.get_categories())
         mark_id = select_item(mark, self._api.get_marks(category_id))
+        state_id = select_item(state, self._api.get_states())
 
         self._params = {
             'main_category': category_id,
@@ -318,7 +347,8 @@ class RiaAverageCarPrice:
                 model,
                 self._api.get_models(category_id, mark_id)
             ),
-            'state_id': select_item(state, self._api.get_states()),
+            'state_id': state_id,
+            'city_id': select_item(city, self._api.get_cities(state_id)),
             'yers': years,
             'raceInt': mileage,
             'gear_id': select_list(
