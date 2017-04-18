@@ -15,7 +15,7 @@ print(api.get_colors())
 """
 
 from pprint import pprint
-from autoria.api import RiaAPI, RiaAverageCarPrice, select_item
+from autoria.api import RiaAPI, RiaAverageCarPrice
 # not implemented yet
 # VEHICLE_MIN_PRICE = '4000'
 # VEHICLE_MAX_PRICE = '5000'
