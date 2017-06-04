@@ -37,7 +37,6 @@ class RiaAPI:
         req_url = self._api_url.format(method=url)
         response = requests.get(url=req_url, params=parameters)
         if response.status_code == 200:
-            print(response.url)
             return json.loads(response.text)
         else:
             raise Exception(
@@ -400,10 +399,14 @@ def select_item(item_to_select: str, items_list: dict) -> int:
         """
         if item_to_select is not None and items_list is not None:
             for item in items_list:
-                if fnmatch(item['name'], '*' + item_to_select + '*'):
+                if fnmatch(item['name'], item_to_select):
                     return item['value']
-        else:
-            return None
+            for item in items_list:
+                if fnmatch(item['name'], '{}*'.format(item_to_select)):
+                    return item['value']
+            for item in items_list:
+                if fnmatch(item['name'], '*{}*'.format(item_to_select)):
+                    return item['value']
 
 
 def select_list(list_to_select: list, items_list: dict) -> list:
