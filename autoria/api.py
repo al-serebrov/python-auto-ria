@@ -287,9 +287,9 @@ class RiaAverageCarPrice:
                  drives: list = None, color: str = None,
                  engine_volume: float = None,
                  seats: int = None, doors: int = None,
-                 carrying: int = None, custom: bool = None,
-                 damage: bool = None, under_credit: bool = None,
-                 confiscated: bool = None, on_repair_parts: bool = None
+                 carrying: int = None, custom: bool = False,
+                 damage: bool = False, under_credit: bool = False,
+                 confiscated: bool = False, on_repair_parts: bool = False
                  ) -> None:
         """Constructor.
 
