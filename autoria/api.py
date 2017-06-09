@@ -351,7 +351,7 @@ class RiaAverageCarPrice:
                 self._api.get_bodystyles(category_id)
             )
 
-        if city is not None:
+        if city is not None and state is not None:
             city_id = select_item(city, self._api.get_cities(state_id))
 
         if gears is not None:
