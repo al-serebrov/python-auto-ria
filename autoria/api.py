@@ -334,34 +334,61 @@ class RiaAverageCarPrice:
         # Getting list of categories and selecting needed id
         category_id = select_item(category, self._api.get_categories())
         mark_id = select_item(mark, self._api.get_marks(category_id))
-        state_id = select_item(state, self._api.get_states())
+        model_id = select_item(
+            model,
+            self._api.get_models(category_id, mark_id)
+        )
+
+        state_id, body_id, city_id, gear_id, option_ids, \
+            fuel_ids, drive_ids, color_id = (None,) * 8  # 8 - qty of variables
+
+        if state is not None:
+            state_id = select_item(state, self._api.get_states())
+
+        if bodystyle is not None:
+            body_id = select_item(
+                bodystyle,
+                self._api.get_bodystyles(category_id)
+            )
+
+        if city is not None:
+            city_id = select_item(city, self._api.get_cities(state_id))
+
+        if gears is not None:
+            gear_id = select_list(
+                gears,
+                self._api.get_gearboxes(category_id)
+            )
+
+        if opts is not None:
+            option_ids = select_list(opts, self._api.get_options(category_id))
+
+        if fuels is not None:
+            fuel_ids = select_list(fuels, self._api.get_fuels())
+
+        if drives is not None:
+            drive_ids = select_list(
+                drives,
+                self._api.get_driver_types(category_id)
+            )
+
+        if color is not None:
+            color_id = select_item(color, self._api.get_colors())
 
         self._params = {
             'main_category': category_id,
-            'body_id': select_item(
-                bodystyle,
-                self._api.get_bodystyles(category_id)
-            ),
             'marka_id': mark_id,
-            'model_id': select_item(
-                model,
-                self._api.get_models(category_id, mark_id)
-            ),
+            'model_id': model_id,
             'state_id': state_id,
-            'city_id': select_item(city, self._api.get_cities(state_id)),
+            'body_id': body_id,
+            'city_id': city_id,
             'yers': years,
             'raceInt': mileage,
-            'gear_id': select_list(
-                gears,
-                self._api.get_gearboxes(category_id)
-            ),
-            'options': select_list(opts, self._api.get_options(category_id)),
-            'fuel_id': select_list(fuels, self._api.get_fuels()),
-            'drive_id': select_list(
-                drives,
-                self._api.get_driver_types(category_id)
-            ),
-            'color_id': select_item(color, self._api.get_colors()),
+            'gear_id': gear_id,
+            'options': option_ids,
+            'fuel_id': fuel_ids,
+            'drive_id': drive_ids,
+            'color_id': color_id,
             'engineVolume': engine_volume,
             'seats': seats,
             'door': doors,
