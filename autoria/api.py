@@ -320,8 +320,8 @@ class RiaAverageCarPrice:
             drives - list with drive types,
                     e.g. ''[Передний, Полный]''
             color - car color like ''Бежевый''
-            engineVolume - (optional) e.g. 1.5
-            seats - (quantity of seats, e.g. 5
+            engineVolume - e.g. 1.5
+            seats - quantity of seats, e.g. 5
             doors - quantity of doors, e.g. 3
             carrying - how much is the car able to carry, e.g. 1500
             custom - is custom clearance needed for the car? 1 - YES, 0 - NO
@@ -331,64 +331,33 @@ class RiaAverageCarPrice:
             on_repair_parts - is the car is broken? 1 - YES, 0 - NO
         """
         self._api = RiaAPI()
-        # Getting list of categories and selecting needed id
+        # Processing required args
+        # Getting the list of categories and selecting needed id
         category_id = select_item(category, self._api.get_categories())
+        # Getting the list of marks and selecting needed id
         mark_id = select_item(mark, self._api.get_marks(category_id))
+        # Getting the list of models and selecting neede id
         model_id = select_item(
             model,
             self._api.get_models(category_id, mark_id)
         )
 
-        state_id, body_id, city_id, gear_id, option_ids, \
-            fuel_ids, drive_ids, color_id = (None,) * 8  # 8 - qty of variables
-
-        if state is not None:
-            state_id = select_item(state, self._api.get_states())
-
-        if bodystyle is not None:
-            body_id = select_item(
-                bodystyle,
-                self._api.get_bodystyles(category_id)
-            )
-
-        if city is not None and state is not None:
-            city_id = select_item(city, self._api.get_cities(state_id))
-
-        if gears is not None:
-            gear_id = select_list(
-                gears,
-                self._api.get_gearboxes(category_id)
-            )
-
-        if opts is not None:
-            option_ids = select_list(opts, self._api.get_options(category_id))
-
-        if fuels is not None:
-            fuel_ids = select_list(fuels, self._api.get_fuels())
-
-        if drives is not None:
-            drive_ids = select_list(
-                drives,
-                self._api.get_driver_types(category_id)
-            )
-
-        if color is not None:
-            color_id = select_item(color, self._api.get_colors())
-
+        # Processing the rest of args, those which are defaulted to None
+        # are processed below
         self._params = {
             'main_category': category_id,
             'marka_id': mark_id,
             'model_id': model_id,
-            'state_id': state_id,
-            'body_id': body_id,
-            'city_id': city_id,
+            'state_id': None,
+            'body_id': None,
+            'city_id': None,
             'yers': years,
             'raceInt': mileage,
-            'gear_id': gear_id,
-            'options': option_ids,
-            'fuel_id': fuel_ids,
-            'drive_id': drive_ids,
-            'color_id': color_id,
+            'gear_id': None,
+            'options': None,
+            'fuel_id': None,
+            'drive_id': None,
+            'color_id': None,
             'engineVolume': engine_volume,
             'seats': seats,
             'door': doors,
@@ -399,6 +368,50 @@ class RiaAverageCarPrice:
             'confiscated_car': confiscated,
             'onRepairParts': on_repair_parts,
         }
+
+        if state is not None:
+            # state_id variable is needed below, whice selecting a city
+            state_id = select_item(state, self._api.get_states())
+            self._params['state_id'] = state_id
+
+        if bodystyle is not None:
+            self._params['body_id'] = select_item(
+                bodystyle,
+                self._api.get_bodystyles(category_id)
+            )
+
+        if city is not None and state is not None:
+            self._params['city_id'] = select_item(
+                city,
+                self._api.get_cities(state_id)
+            )
+
+        if gears is not None:
+            self._params['gear_id'] = select_list(
+                gears,
+                self._api.get_gearboxes(category_id)
+            )
+
+        if opts is not None:
+            self._params['options'] = select_list(
+                opts,
+                self._api.get_options(category_id)
+            )
+
+        if fuels is not None:
+            self._params['fuel_id'] = select_list(fuels, self._api.get_fuels())
+
+        if drives is not None:
+            self._params['drive_id'] = select_list(
+                drives,
+                self._api.get_driver_types(category_id)
+            )
+
+        if color is not None:
+            self._params['color_id'] = select_item(
+                color,
+                self._api.get_colors()
+            )
 
     def get_average(self) -> dict:
         """Get average price for composed search parameters."""
