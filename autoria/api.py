@@ -342,31 +342,54 @@ class RiaAverageCarPrice:
             self._api.get_models(category_id, mark_id)
         )
 
+        self.CATEGORY = 'main_category'
+        self.MARK = 'marka_id',
+        self.MODEL = 'model_id'
+        self.STATE = 'state_id'
+        self.BODY = 'body_id'
+        self.CITY = 'city_id'
+        self.YEARS = 'yers'
+        self.MILEAGE = 'race_int'
+        self.GEAR = 'gear_id'
+        self.OPTIONS = 'options'
+        self.FUEL = 'fuel_id'
+        self.DRIVE = 'drive_id'
+        self.COLOR = 'color_id'
+        self.ENGINEVOLUME = 'engineVolume'
+        self.SEATS = 'seats'
+        self.DOOR = 'door'
+        self.CARRYING = 'carrying'
+        self.CUSTOM = 'custom'
+        self.DAMAGE = 'damage'
+        self.CREDIT = 'under_credit'
+        self.CONFISCATED = 'confiscated_car'
+        self.REPAIR = 'onRepairParts'
+        
         # Processing the rest of args, those which are defaulted to None
         # are processed below
         self._params = {
-            'main_category': category_id,
-            'marka_id': mark_id,
-            'model_id': model_id,
-            'state_id': None,
-            'body_id': None,
-            'city_id': None,
-            'yers': years,
-            'raceInt': mileage,
-            'gear_id': None,
-            'options': None,
-            'fuel_id': None,
-            'drive_id': None,
-            'color_id': None,
-            'engineVolume': engine_volume,
-            'seats': seats,
-            'door': doors,
-            'carrying': carrying,
-            'custom': custom,
-            'damage': damage,
-            'under_credit': under_credit,
-            'confiscated_car': confiscated,
-            'onRepairParts': on_repair_parts,
+            self.CATEGORY: category_id,
+            self.MARK: mark_id,
+            self.MODEL: model_id,
+            self.STATE: None,
+            self.BODY: None,
+            self.CITY: None,
+            self.YEARS: years,
+            self.MILEAGE: mileage,
+            self.GEAR: None,
+            self.OPTIONS: None,
+            self.FUEL: None,
+            self.DRIVE: None,
+            self.COLOR: None,
+            self.ENGINEVOLUME: engine_volume,
+            self.SEATS: seats,
+            self.DOOR: doors,
+            self.CARRYING: carrying,
+            self.CUSTOM: custom,
+            self.DAMAGE: damage,
+            self.CREDIT: under_credit,
+            self.CONFISCATED: confiscated,
+            self.REPAIR: on_repair_parts,
         }
 
         if state is not None:
