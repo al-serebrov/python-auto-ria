@@ -22,6 +22,30 @@ class RiaAPI:
     def __init__(self):
         """Constructor."""
         self._api_url = 'http://api.auto.ria.com{method}'
+        self._params = {
+            'CATEGORY': 'main_category',
+            'MARK': 'marka_id',
+            'MODEL': 'model_id',
+            'STATE': 'state_id',
+            'BODY': 'body_id',
+            'CITY': 'city_id',
+            'YEARS': 'yers',
+            'MILEAGE': 'race_int',
+            'GEAR': 'gear_id',
+            'OPTIONS': 'options',
+            'FUEL': 'fuel_id',
+            'DRIVE': 'drive_id',
+            'COLOR': 'color_id',
+            'ENGINEVOLUME': 'engineVolume',
+            'SEATS': 'seats',
+            'DOOR': 'door',
+            'CARRYING': 'carrying',
+            'CUSTOM': 'custom',
+            'DAMAGE': 'damage',
+            'CREDIT': 'under_credit',
+            'CONFISCATED': 'confiscated_car',
+            'REPAIR': 'onRepairParts'
+        }
 
     def _make_request(
             self, url: str, parameters: dict = None) -> Any:
@@ -42,6 +66,17 @@ class RiaAPI:
             raise Exception(
                 'Error making a request to: {}, response: {}, {}'
                 .format(url, response.status_code, response.text))
+
+    def get_params(self) -> List:
+        """Get Auto RIA API parameter names from constants.
+
+        Returns:
+            Ready to use dictionary with API parameters defaulted to None.
+        """
+        params_processed = {}
+        for key, value in self._params.items():
+            params_processed[value] = None
+        return params_processed
 
     def get_categories(self) -> List[Dict[str, Any]]:
         """Get available vehicle types from auto.ria.com.
@@ -331,6 +366,9 @@ class RiaAverageCarPrice:
             on_repair_parts - is the car is broken? 1 - YES, 0 - NO
         """
         self._api = RiaAPI()
+
+        self._params = self._api.get_params()
+
         # Processing required args
         # Getting the list of categories and selecting needed id
         category_id = select_item(category, self._api.get_categories())
@@ -341,56 +379,16 @@ class RiaAverageCarPrice:
             model,
             self._api.get_models(category_id, mark_id)
         )
+        # Processing the rest of args
 
-        self.CATEGORY = 'main_category'
-        self.MARK = 'marka_id',
-        self.MODEL = 'model_id'
-        self.STATE = 'state_id'
-        self.BODY = 'body_id'
-        self.CITY = 'city_id'
-        self.YEARS = 'yers'
-        self.MILEAGE = 'race_int'
-        self.GEAR = 'gear_id'
-        self.OPTIONS = 'options'
-        self.FUEL = 'fuel_id'
-        self.DRIVE = 'drive_id'
-        self.COLOR = 'color_id'
-        self.ENGINEVOLUME = 'engineVolume'
-        self.SEATS = 'seats'
-        self.DOOR = 'door'
-        self.CARRYING = 'carrying'
-        self.CUSTOM = 'custom'
-        self.DAMAGE = 'damage'
-        self.CREDIT = 'under_credit'
-        self.CONFISCATED = 'confiscated_car'
-        self.REPAIR = 'onRepairParts'
-        
-        # Processing the rest of args, those which are defaulted to None
-        # are processed below
-        self._params = {
-            self.CATEGORY: category_id,
-            self.MARK: mark_id,
-            self.MODEL: model_id,
-            self.STATE: None,
-            self.BODY: None,
-            self.CITY: None,
-            self.YEARS: years,
-            self.MILEAGE: mileage,
-            self.GEAR: None,
-            self.OPTIONS: None,
-            self.FUEL: None,
-            self.DRIVE: None,
-            self.COLOR: None,
-            self.ENGINEVOLUME: engine_volume,
-            self.SEATS: seats,
-            self.DOOR: doors,
-            self.CARRYING: carrying,
-            self.CUSTOM: custom,
-            self.DAMAGE: damage,
-            self.CREDIT: under_credit,
-            self.CONFISCATED: confiscated,
-            self.REPAIR: on_repair_parts,
-        }
+        self._params['main_category'] = category_id
+        self._params['marka_id'] = mark_id
+        self._params['model_id'] = model_id
+        self._params['custom'] = custom
+        self._params['damage'] = damage
+        self._params['under_credit'] = under_credit
+        self._params['confiscated_car'] = confiscated
+        self._params['onRepairParts'] = on_repair_parts
 
         if state is not None:
             # state_id variable is needed below, whice selecting a city
