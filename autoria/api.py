@@ -8,7 +8,7 @@ average used car prices that are sold on http://auto.ria.com
 import requests
 import json
 from fnmatch import fnmatch
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 class RiaAPI:
@@ -277,148 +277,245 @@ class RiaAverageCarPrice:
 
     Search parametrs are composed during instance initialization,
     the request for average price is sent using RiaAPI class.
+
+    Constructor accepts three required parameters - category, mark and
+    model and the rest can be specified either as constructor keyword
+    parameters:
+
+        avg_price = RiaAverageCarPrice(
+            category, mark, model, opts=the_opts, gears=the_gears)
+
+    Or chained to the object:
+
+        avg_price = RiaAverageCarPrice(category, mark, model)
+        avg_price.opts(the_opts).gears(the_gears)
+
+    Then get the average price this way:
+
+        result = avg_price.get_average()
     """
 
-    def __init__(self, category: str, mark: str, model: str,
-                 bodystyle: str = None, years: list = None,
-                 state: str = None, city: str = None,
-                 gears: list = None, opts: list = None,
-                 mileage: list = None, fuels: list = None,
-                 drives: list = None, color: str = None,
-                 engine_volume: float = None,
-                 seats: int = None, doors: int = None,
-                 carrying: int = None, custom: int = None,
-                 damage: int = None, under_credit: int = None,
-                 confiscated: int = None, on_repair_parts: int = None
-                 ) -> None:
+    def __init__(self, category: str, mark: str, model: str, **kwargs) -> None:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
-        Acceps the following search parameters.
 
         Args:
-            category - vehicle type, e.g. ''Легковые''
-            mark - mark, like ''Renault''
-            model - model, like ''Scenic''
-        All following args are optional:
-            bodystyle - bodystyle, e.g. ''Седан''
-            year - list with start and end manufacturing year,
+            category: vehicle type, e.g. ''Легковые''
+            mark: vehicle mark, like ''Renault''
+            model: vehicle model, like ''Scenic''
+            bodystyle: optional, bodystyle, e.g. ''Седан''
+            year: optional, list with start and end manufacturing year,
                    e.g. ''[2005, 2006]'', also one of years could be
                    ''None'', e.g. ''[2005, None]''
-            state - state, e.g. ''Харьковская''
-            city - city inside of state, e.g. ''Харьков'', if
+            state: optional, state, e.g. ''Харьковская''
+            city: optional, city inside of state, e.g. ''Харьков'', if
                 the state is not selected (state=None), city won't be
                 selected too, and won't have any influence on search results
-            gears - list with gearshift types,
+            gears: optional, list with gearshift types,
                         e.g. ['Ручная', 'Автомат']
-            opts - list with neede options, like
-                ['ABS', 'ABD']
-            mileage - list with start and end mileage, e.g.:
+            opts: optional, list with neede options, like ['ABS', 'ABD']
+            mileage: optional, list with start and end mileage, e.g.:
                 [10, 100]
-            fuels - list with gasoline types,
-                    e.g. ''[Бензин, Газ/Бензин]''
-            drives - list with drive types,
+            fuels: optional, list with gasoline types,
+                   e.g. ''[Бензин, Газ/Бензин]''
+            drives: optional, list with drive types,
                     e.g. ''[Передний, Полный]''
-            color - car color like ''Бежевый''
-            engineVolume - e.g. 1.5
-            seats - quantity of seats, e.g. 5
-            doors - quantity of doors, e.g. 3
-            carrying - how much is the car able to carry, e.g. 1500
-            custom - is custom clearance needed for the car? 1 - YES, 0 - NO
-            damage - is the car damaged in car accident? 1 - YES, 0 - NO
-            credit - is the car under credit? 1 - YES, 0 - NO
-            confiscated - is the car confiscated? 1 - YES, 0 - NO
-            on_repair_parts - is the car is broken? 1 - YES, 0 - NO
+            color: optional, car color like ''Бежевый''
+            engineVolume: optional, e.g. 1.5
+            seats: optional, quantity of seats, e.g. 5
+            doors: optional, quantity of doors, e.g. 3
+            carrying: optional, how much is the car able to carry, e.g. 1500
+            custom: optional, is custom clearance needed for the car?
+                    1 - YES, 0 - NO
+            damage: optional, is the car damaged in car accident?
+                    1 - YES, 0 - NO
+            credit: optional, is the car under credit? 1 - YES, 0 - NO
+            confiscated: optional, is the car confiscated? 1 - YES, 0 - NO
+            on_repair_parts: optional, is the car is broken? 1 - YES, 0 - NO
         """
+        # Init all the parameters.
+        self._category_id = None
+        self._mark_id = None
+        self._model_id = None
+        self._state_id = None
+        self._body_id = None
+        self._city_id = None
+        self._years = None
+        self._mileage = None
+        self._gear_id = None
+        self._options = None
+        self._fuel_id = None
+        self._drive_id = None
+        self._color_id = None
+        self._engine_volume = None
+        self._seats = None
+        self._doors = None
+        self._carrying = None
+        self._custom = None
+        self._damage = None
+        self._under_credit = None
+        self._confiscated = None
+        self._on_repair_parts = None
+
+        # Create API client.
         self._api = RiaAPI()
-        # Processing required args
-        # Getting the list of categories and selecting needed id
-        category_id = select_item(category, self._api.get_categories())
+
+        # Processing required arguments: category, mark, model.
+        # Getting the list of categories and selecting needed id.
+        self._category(category)
         # Getting the list of marks and selecting needed id
-        mark_id = select_item(mark, self._api.get_marks(category_id))
+        self._mark(mark)
         # Getting the list of models and selecting neede id
-        model_id = select_item(
-            model,
-            self._api.get_models(category_id, mark_id)
-        )
+        self._model(model)
 
-        # Processing the rest of args, those which are defaulted to None
-        # are processed below
-        self._params = {
-            'main_category': category_id,
-            'marka_id': mark_id,
-            'model_id': model_id,
-            'state_id': None,
-            'body_id': None,
-            'city_id': None,
-            'yers': years,
-            'raceInt': mileage,
-            'gear_id': None,
-            'options': None,
-            'fuel_id': None,
-            'drive_id': None,
-            'color_id': None,
-            'engineVolume': engine_volume,
-            'seats': seats,
-            'door': doors,
-            'carrying': carrying,
-            'custom': custom,
-            'damage': damage,
-            'under_credit': under_credit,
-            'confiscated_car': confiscated,
-            'onRepairParts': on_repair_parts,
-        }
+        # Processing optional arguments.
+        state = None
+        city = None
+        for key in kwargs:
+            # To shorten the code we call the setter method by name,
+            # this is same as if we did this:
+            #
+            # for key in kwargs:
+            #     if key == 'state':
+            #         self.state(kwargs['state'])
+            #     if key == 'bodystyle':
+            #         self.bodystyle(kwargs['bodystyle'])
+            #      ... and so on
+            if not hasattr(self, key):
+                raise Exception('Unknown parameter: {}'.format(key))
+            # We have special handling for state and city as we need to
+            # process them together.
+            if key == 'state':
+                state = kwargs['state']
+            elif key == 'city':
+                city = kwargs['city']
+            else:
+                getattr(self, key)(kwargs[key])
 
-        if state is not None:
-            # state_id variable is needed below, whice selecting a city
-            state_id = select_item(state, self._api.get_states())
-            self._params['state_id'] = state_id
-
-        if bodystyle is not None:
-            self._params['body_id'] = select_item(
-                bodystyle,
-                self._api.get_bodystyles(category_id)
-            )
-
-        if city is not None and state is not None:
-            self._params['city_id'] = select_item(
-                city,
-                self._api.get_cities(state_id)
-            )
-
-        if gears is not None:
-            self._params['gear_id'] = select_list(
-                gears,
-                self._api.get_gearboxes(category_id)
-            )
-
-        if opts is not None:
-            self._params['options'] = select_list(
-                opts,
-                self._api.get_options(category_id)
-            )
-
-        if fuels is not None:
-            self._params['fuel_id'] = select_list(fuels, self._api.get_fuels())
-
-        if drives is not None:
-            self._params['drive_id'] = select_list(
-                drives,
-                self._api.get_driver_types(category_id)
-            )
-
-        if color is not None:
-            self._params['color_id'] = select_item(
-                color,
-                self._api.get_colors()
-            )
+        if state and city:
+            self.city(state, city)
+        elif state:
+            self.state(state)
 
     def get_average(self) -> dict:
         """Get average price for composed search parameters."""
-        return self._api.average_price(self._params)
+        return self._api.average_price(self.as_dict())
+
+    def _category(self, category):
+        """Set category.
+
+        The method is private because category is a required constructor
+        parameter.
+        """
+        self._category_id = select_item(category, self._api.get_categories())
+
+    def _mark(self, mark):
+        """Set mark.
+
+        The method is private because mark is a required constructor
+        parameter.
+        """
+        self._mark_id = select_item(
+            mark, self._api.get_marks(self._category_id))
+
+    def _model(self, model):
+        """Set model.
+
+        The method is private because model is a required constructor
+        parameter.
+        """
+        self._model_id = select_item(
+            model,
+            self._api.get_models(self._category_id, self._mark_id)
+        )
+
+    def bodystyle(self, bodystyle):
+        """Set bodystyle."""
+        self._body_id = select_item(
+            bodystyle,
+            self._api.get_bodystyles(self._category_id)
+        )
+        return self
+
+    def state(self, state):
+        """Set state."""
+        self._state_id = select_item(state, self._api.get_states())
+
+    def city(self, state, city):
+        """Set state and city."""
+        self.state(state)
+        self._city_id = select_item(
+            city,
+            self._api.get_cities(self._state_id)
+        )
+        return self
+
+    def gears(self, gears):
+        """Set gears."""
+        self._gear_id = select_list(
+            gears,
+            self._api.get_gearboxes(self._category_id)
+        )
+        return self
+
+    def opts(self, opts):
+        """Set opts."""
+        self._options = select_list(
+            opts,
+            self._api.get_options(self._category_id)
+        )
+        return self
+
+    def fuels(self, fuels):
+        """Set fuels."""
+        self._fuel_id = select_list(fuels, self._api.get_fuels())
+        return self
+
+    def drives(self, drives):
+        """Set drives."""
+        self._drive_id = select_list(
+            drives,
+            self._api.get_driver_types(self._category_id)
+        )
+        return self
+
+    def color(self, color):
+        """Set color."""
+        self._color_id = select_item(
+            color,
+            self._api.get_colors()
+        )
+        return self
+
+    def as_dict(self):
+        return {
+            'main_category': self._category_id,
+            'marka_id': self._mark_id,
+            'model_id': self._model_id,
+            'state_id': self._state_id,
+            'body_id': self._body_id,
+            'city_id': self._city_id,
+            'yers': self._years,
+            'raceInt': self._mileage,
+            'gear_id': self._gear_id,
+            'options': self._options,
+            'fuel_id': self._fuel_id,
+            'drive_id': self._drive_id,
+            'color_id': self._color_id,
+            'engineVolume': self._engine_volume,
+            'seats': self._seats,
+            'door': self._doors,
+            'carrying': self._carrying,
+            'custom': self._custom,
+            'damage': self._damage,
+            'under_credit': self._under_credit,
+            'confiscated_car': self._confiscated,
+            'onRepairParts': self._on_repair_parts
+        }
 
 
-def select_item(item_to_select: str, items_list: list) -> int:
+def select_item(item_to_select: str, items_list: list) -> Optional[int]:
         """Select vehicle type, bodystyle, mark, model from the given list.
 
         This function is intended to convert human-readable search
@@ -449,7 +546,7 @@ def select_item(item_to_select: str, items_list: list) -> int:
                     return item['value']
 
 
-def select_list(list_to_select: list, items_list: list) -> list:
+def select_list(list_to_select: list, items_list: list) -> Optional[list]:
     """Select a list of ids in the list of dictionaries.
 
     The function is intended to select a list of options inside
