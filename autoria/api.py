@@ -7,6 +7,7 @@ average used car prices that are sold on http://auto.ria.com
 
 import requests
 import json
+from collections import OrderedDict
 from fnmatch import fnmatch
 from typing import Any, Dict, List
 
@@ -67,16 +68,13 @@ class RiaAPI:
                 'Error making a request to: {}, response: {}, {}'
                 .format(url, response.status_code, response.text))
 
-    def get_params(self) -> List:
+    def get_params(self) -> Dict:
         """Get Auto RIA API parameter names from constants.
 
         Returns:
-            Ready to use dictionary with API parameters defaulted to None.
+            Ready to use dictionary with API parameters.
         """
-        params_processed = {}
-        for key, value in self._params.items():
-            params_processed[value] = None
-        return params_processed
+        return self._params
 
     def get_categories(self) -> List[Dict[str, Any]]:
         """Get available vehicle types from auto.ria.com.
@@ -367,7 +365,7 @@ class RiaAverageCarPrice:
         """
         self._api = RiaAPI()
 
-        self._params = self._api.get_params()
+        self._api_params = self._api.get_params()
 
         # Processing required args
         # Getting the list of categories and selecting needed id
@@ -381,62 +379,109 @@ class RiaAverageCarPrice:
         )
         # Processing the rest of args
 
-        self._params['main_category'] = category_id
-        self._params['marka_id'] = mark_id
-        self._params['model_id'] = model_id
-        self._params['custom'] = custom
-        self._params['damage'] = damage
-        self._params['under_credit'] = under_credit
-        self._params['confiscated_car'] = confiscated
-        self._params['onRepairParts'] = on_repair_parts
-
         if state is not None:
             # state_id variable is needed below, whice selecting a city
             state_id = select_item(state, self._api.get_states())
-            self._params['state_id'] = state_id
+        else:
+            state_id = None
 
         if bodystyle is not None:
-            self._params['body_id'] = select_item(
+            bodystyle_id = select_item(
                 bodystyle,
                 self._api.get_bodystyles(category_id)
             )
+        else:
+            bodystyle_id = None
 
         if city is not None and state is not None:
-            self._params['city_id'] = select_item(
+            city_id = select_item(
                 city,
                 self._api.get_cities(state_id)
             )
+        else:
+            city_id = None
 
         if gears is not None:
-            self._params['gear_id'] = select_list(
+            gear_id = select_list(
                 gears,
                 self._api.get_gearboxes(category_id)
             )
+        else:
+            gear_id = None
 
         if opts is not None:
-            self._params['options'] = select_list(
+            options_id = select_list(
                 opts,
                 self._api.get_options(category_id)
             )
+        else:
+            options_id = None
 
         if fuels is not None:
-            self._params['fuel_id'] = select_list(fuels, self._api.get_fuels())
+            fuel_id = select_list(fuels, self._api.get_fuels())
+        else:
+            fuel_id = None
 
         if drives is not None:
-            self._params['drive_id'] = select_list(
+            drive_id = select_list(
                 drives,
                 self._api.get_driver_types(category_id)
             )
+        else:
+            drive_id = None
 
         if color is not None:
-            self._params['color_id'] = select_item(
+            color_id = select_item(
                 color,
                 self._api.get_colors()
             )
+        else:
+            color_id = None
+
+        self._params = self.assign_parameters_to_dict(
+            api_params=self._api_params, category=category_id,
+            mark=mark_id, model=model_id, bodystyle=bodystyle_id, years=years,
+            state=state_id, city=city_id, gears=gear_id, opts=options_id,
+            mileage=mileage, fuels=fuel_id, drives=drive_id, color=color_id,
+            engine_volume=engine_volume, seats=seats, doors=doors,
+            carrying=carrying, custom=custom, damage=damage,
+            under_credit=under_credit, confiscated=confiscated,
+            on_repair_parts=on_repair_parts
+        )
+        print(self._params)
 
     def get_average(self) -> dict:
         """Get average price for composed search parameters."""
         return self._api.average_price(self._params)
+
+    def assign_parameters_to_dict(
+        self, api_params: dict, category: str, mark: str, model: str,
+        bodystyle: str = None, years: list = None,
+        state: str = None, city: str = None,
+        gears: list = None, opts: list = None,
+        mileage: list = None, fuels: list = None,
+        drives: list = None, color: str = None,
+        engine_volume: float = None,
+        seats: int = None, doors: int = None,
+        carrying: int = None, custom: int = None,
+        damage: int = None, under_credit: int = None,
+        confiscated: int = None, on_repair_parts: int = None
+    ) -> Dict:
+        """Add docsring here."""
+        params_list = [
+            bodystyle, carrying, category, city, color,
+            confiscated, under_credit, custom, damage, doors,
+            drives, engine_volume, fuels, gears, mark, mileage,
+            model, opts, on_repair_parts, seats, state, years
+        ]
+        api_params_processed = OrderedDict(
+            sorted(api_params.items(),
+                   key=lambda t: t[0])
+        )
+        assigned_dict = {}
+        for i, (key, value) in enumerate(api_params_processed.items()):
+            assigned_dict[value] = params_list[i]
+        return assigned_dict
 
 
 def select_item(item_to_select: str, items_list: list) -> int:
