@@ -277,47 +277,62 @@ class RiaAverageCarPrice:
 
     Search parametrs are composed during instance initialization,
     the request for average price is sent using RiaAPI class.
+
+    Constructor accepts three required parameters - category, mark and
+    model and the rest can be specified either as constructor keyword
+    parameters:
+
+        avg_price = RiaAverageCarPrice(
+            category, mark, model, opts=the_opts, gears=the_gears)
+
+    Or chained to the object:
+
+        avg_price = RiaAverageCarPrice(category, mark, model)
+        avg_price.opts(the_opts).gears(the_gears)
+
+    Then get the average price this way:
+
+        result = avg_price.get_average()
     """
 
     def __init__(self, category: str, mark: str, model: str, **kwargs) -> None:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
-        Acceps the following search parameters.
 
         Args:
-            category - vehicle type, e.g. ''Легковые''
-            mark - mark, like ''Renault''
-            model - model, like ''Scenic''
-        All following args are optional:
-            bodystyle - bodystyle, e.g. ''Седан''
-            year - list with start and end manufacturing year,
+            category: vehicle type, e.g. ''Легковые''
+            mark: vehicle mark, like ''Renault''
+            model: vehicle model, like ''Scenic''
+            bodystyle: optional, bodystyle, e.g. ''Седан''
+            year: optional, list with start and end manufacturing year,
                    e.g. ''[2005, 2006]'', also one of years could be
                    ''None'', e.g. ''[2005, None]''
-            state - state, e.g. ''Харьковская''
-            city - city inside of state, e.g. ''Харьков'', if
+            state: optional, state, e.g. ''Харьковская''
+            city: optional, city inside of state, e.g. ''Харьков'', if
                 the state is not selected (state=None), city won't be
                 selected too, and won't have any influence on search results
-            gears - list with gearshift types,
+            gears: optional, list with gearshift types,
                         e.g. ['Ручная', 'Автомат']
-            opts - list with neede options, like
-                ['ABS', 'ABD']
-            mileage - list with start and end mileage, e.g.:
+            opts: optional, list with neede options, like ['ABS', 'ABD']
+            mileage: optional, list with start and end mileage, e.g.:
                 [10, 100]
-            fuels - list with gasoline types,
-                    e.g. ''[Бензин, Газ/Бензин]''
-            drives - list with drive types,
+            fuels: optional, list with gasoline types,
+                   e.g. ''[Бензин, Газ/Бензин]''
+            drives: optional, list with drive types,
                     e.g. ''[Передний, Полный]''
-            color - car color like ''Бежевый''
-            engineVolume - e.g. 1.5
-            seats - quantity of seats, e.g. 5
-            doors - quantity of doors, e.g. 3
-            carrying - how much is the car able to carry, e.g. 1500
-            custom - is custom clearance needed for the car? 1 - YES, 0 - NO
-            damage - is the car damaged in car accident? 1 - YES, 0 - NO
-            credit - is the car under credit? 1 - YES, 0 - NO
-            confiscated - is the car confiscated? 1 - YES, 0 - NO
-            on_repair_parts - is the car is broken? 1 - YES, 0 - NO
+            color: optional, car color like ''Бежевый''
+            engineVolume: optional, e.g. 1.5
+            seats: optional, quantity of seats, e.g. 5
+            doors: optional, quantity of doors, e.g. 3
+            carrying: optional, how much is the car able to carry, e.g. 1500
+            custom: optional, is custom clearance needed for the car?
+                    1 - YES, 0 - NO
+            damage: optional, is the car damaged in car accident?
+                    1 - YES, 0 - NO
+            credit: optional, is the car under credit? 1 - YES, 0 - NO
+            confiscated: optional, is the car confiscated? 1 - YES, 0 - NO
+            on_repair_parts: optional, is the car is broken? 1 - YES, 0 - NO
         """
         # Init all the parameters.
         self._category_id = None
@@ -390,14 +405,16 @@ class RiaAverageCarPrice:
     def _category(self, category):
         """Set category.
 
-        The method is private because category is a required constructor parameter.
+        The method is private because category is a required constructor
+        parameter.
         """
         self._category_id = select_item(category, self._api.get_categories())
 
     def _mark(self, mark):
         """Set mark.
 
-        The method is private because mark is a required constructor parameter.
+        The method is private because mark is a required constructor
+        parameter.
         """
         self._mark_id = select_item(
             mark, self._api.get_marks(self._category_id))
@@ -405,7 +422,8 @@ class RiaAverageCarPrice:
     def _model(self, model):
         """Set model.
 
-        The method is private because model is a required constructor parameter.
+        The method is private because model is a required constructor
+        parameter.
         """
         self._model_id = select_item(
             model,
