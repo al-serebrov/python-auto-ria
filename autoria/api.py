@@ -272,6 +272,60 @@ class RiaAPI:
         return self._make_request('/average', parameters)
 
 
+class RiaAverageCarPriceParameters:
+
+    def __init__(self, category_id, mark_id, model_id):
+        self.category_id = category_id
+        self.mark_id = mark_id
+        self.model_id = model_id
+        self.state_id = None
+        self.body_id = None
+        self.city_id = None
+        self.years = None
+        self.mileage = None
+        self.gear_id =  None
+        self.options = None
+        self.fuel_id None
+        self.drive_id = None
+        self.color_id = None
+        self.engine_volume = None
+        self.seats = None
+        self.doors = None
+        self.carrying = None
+        self.custom = None
+        self.damage = None
+        self.under_credit = None
+        self.confiscated = None
+        self.on_repair_parts = None
+
+    def as_dict(self):
+        return {
+            'main_category': self.category_id
+            'marka_id': self.mark_id
+            'model_id': self.model_id
+            'state_id': self.state_id
+            'body_id': self.body_id
+            'city_id': self.city_id
+            'yers': self.years
+            'raceInt': self.mileage
+            'gear_id': self.gear_id
+            'options': self.options
+            'fuel_id': self.fuel_id
+            'drive_id': self.drive_id
+            'color_id': self.color_id
+            'engineVolume': self.engine_volume
+            'seats': self.seats
+            'door': self.doors
+            'carrying': self.carrying
+            'custom': self.custom
+            'damage': self.damage
+            'under_credit': self.under_credit
+            'confiscated_car': self.confiscated
+            'onRepairParts': self.on_repair_parts
+        }
+
+
+
 class RiaAverageCarPrice:
     """Compose search parameters and get an average price.
 
@@ -279,18 +333,7 @@ class RiaAverageCarPrice:
     the request for average price is sent using RiaAPI class.
     """
 
-    def __init__(self, category: str, mark: str, model: str,
-                 bodystyle: str = None, years: list = None,
-                 state: str = None, city: str = None,
-                 gears: list = None, opts: list = None,
-                 mileage: list = None, fuels: list = None,
-                 drives: list = None, color: str = None,
-                 engine_volume: float = None,
-                 seats: int = None, doors: int = None,
-                 carrying: int = None, custom: int = None,
-                 damage: int = None, under_credit: int = None,
-                 confiscated: int = None, on_repair_parts: int = None
-                 ) -> None:
+    def __init__(self, category: str, mark: str, model: str, **kwargs) -> None:
         """Constructor.
 
         Compose parameters for GET request to auro.ria.com API.
@@ -341,81 +384,55 @@ class RiaAverageCarPrice:
             model,
             self._api.get_models(category_id, mark_id)
         )
-
-        # Processing the rest of args, those which are defaulted to None
-        # are processed below
-        self._params = {
-            'main_category': category_id,
-            'marka_id': mark_id,
-            'model_id': model_id,
-            'state_id': None,
-            'body_id': None,
-            'city_id': None,
-            'yers': years,
-            'raceInt': mileage,
-            'gear_id': None,
-            'options': None,
-            'fuel_id': None,
-            'drive_id': None,
-            'color_id': None,
-            'engineVolume': engine_volume,
-            'seats': seats,
-            'door': doors,
-            'carrying': carrying,
-            'custom': custom,
-            'damage': damage,
-            'under_credit': under_credit,
-            'confiscated_car': confiscated,
-            'onRepairParts': on_repair_parts,
-        }
+        self._params = RiaAverageCarPriceParameters(category_id, mark_id, model_id)
 
         if state is not None:
             # state_id variable is needed below, whice selecting a city
             state_id = select_item(state, self._api.get_states())
-            self._params['state_id'] = state_id
+            self._params.state_id = state_id
 
         if bodystyle is not None:
-            self._params['body_id'] = select_item(
+            self._params.body_id = select_item(
                 bodystyle,
                 self._api.get_bodystyles(category_id)
             )
 
         if city is not None and state is not None:
-            self._params['city_id'] = select_item(
+            self._params.city_id = select_item(
                 city,
                 self._api.get_cities(state_id)
             )
 
         if gears is not None:
-            self._params['gear_id'] = select_list(
+            self._params.gear_id = select_list(
                 gears,
                 self._api.get_gearboxes(category_id)
             )
 
         if opts is not None:
-            self._params['options'] = select_list(
+            self._params.options = select_list(
                 opts,
                 self._api.get_options(category_id)
             )
 
         if fuels is not None:
-            self._params['fuel_id'] = select_list(fuels, self._api.get_fuels())
+            self._params.fuel_id = select_list(fuels, self._api.get_fuels())
 
         if drives is not None:
-            self._params['drive_id'] = select_list(
+            self._params.drive_id = select_list(
                 drives,
                 self._api.get_driver_types(category_id)
             )
 
         if color is not None:
-            self._params['color_id'] = select_item(
+            self._params.color_id = select_item(
                 color,
                 self._api.get_colors()
             )
 
     def get_average(self) -> dict:
         """Get average price for composed search parameters."""
-        return self._api.average_price(self._params)
+        return self._api.average_price(self._params.as_dict())
 
 
 def select_item(item_to_select: str, items_list: list) -> int:
