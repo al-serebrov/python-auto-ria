@@ -9,6 +9,7 @@ import requests
 import json
 from fnmatch import fnmatch
 from typing import Any, Dict, List
+from collections import namedtuple
 
 
 class RiaAPI:
@@ -272,6 +273,32 @@ class RiaAPI:
         return self._make_request('/average', parameters)
 
 
+RiaAverageCarPriceParams = namedtuple('RiaAverageCarPriceParams', [
+    'main_category',
+    'marka_id',
+    'model_id',
+    'state_id',
+    'body_id',
+    'city_id',
+    'yers',
+    'raceInt',
+    'gear_id',
+    'options',
+    'fuel_id',
+    'drive_id',
+    'color_id',
+    'engineVolume',
+    'seats',
+    'door',
+    'carrying',
+    'custom',
+    'damage',
+    'under_credit',
+    'confiscated_car',
+    'onRepairParts',
+])
+
+
 class RiaAverageCarPrice:
     """Compose search parameters and get an average price.
 
@@ -320,8 +347,8 @@ class RiaAverageCarPrice:
             drives - list with drive types,
                     e.g. ''[Передний, Полный]''
             color - car color like ''Бежевый''
-            engineVolume - (optional) e.g. 1.5
-            seats - (quantity of seats, e.g. 5
+            engineVolume - e.g. 1.5
+            seats - quantity of seats, e.g. 5
             doors - quantity of doors, e.g. 3
             carrying - how much is the car able to carry, e.g. 1500
             custom - is custom clearance needed for the car?
@@ -331,51 +358,93 @@ class RiaAverageCarPrice:
             on_repair_parts - is the car is broken?
         """
         self._api = RiaAPI()
-        # Getting list of categories and selecting needed id
+        # Processing required args
+        # Getting the list of categories and selecting needed id
         category_id = select_item(category, self._api.get_categories())
+        # Getting the list of marks and selecting needed id
         mark_id = select_item(mark, self._api.get_marks(category_id))
-        state_id = select_item(state, self._api.get_states())
+        # Getting the list of models and selecting neede id
+        model_id = select_item(
+            model,
+            self._api.get_models(category_id, mark_id)
+        )
 
-        self._params = {
-            'main_category': category_id,
-            'body_id': select_item(
+        # Processing the rest of args, those which are defaulted to None
+        # are processed below
+        self._params = RiaAverageCarPriceParams(
+            main_category=category_id,
+            marka_id=mark_id,
+            model_id=model_id,
+            state_id=None,
+            body_id=None,
+            city_id=None,
+            yers=years,
+            raceInt=mileage,
+            gear_id=None,
+            options=None,
+            fuel_id=None,
+            drive_id=None,
+            color_id=None,
+            engineVolume=engine_volume,
+            seats=seats,
+            door=doors,
+            carrying=carrying,
+            custom=custom,
+            damage=damage,
+            under_credit=under_credit,
+            confiscated_car=confiscated,
+            onRepairParts=on_repair_parts,
+        )
+
+        if state is not None:
+            # state_id variable is needed below, whice selecting a city
+            state_id = select_item(state, self._api.get_states())
+            self._params = self._params._replace(state_id=state_id)
+
+        if bodystyle is not None:
+            self._params = self._params._replace(body_id=select_item(
                 bodystyle,
                 self._api.get_bodystyles(category_id)
-            ),
-            'marka_id': mark_id,
-            'model_id': select_item(
-                model,
-                self._api.get_models(category_id, mark_id)
-            ),
-            'state_id': state_id,
-            'city_id': select_item(city, self._api.get_cities(state_id)),
-            'yers': years,
-            'raceInt': mileage,
-            'gear_id': select_list(
+            ))
+
+        if city is not None and state is not None:
+            self._params = self._params._replace(city_id=select_item(
+                city,
+                self._api.get_cities(state_id)
+            ))
+
+        if gears is not None:
+            self._params = self._params._replace(gear_id=select_list(
                 gears,
                 self._api.get_gearboxes(category_id)
-            ),
-            'options': select_list(opts, self._api.get_options(category_id)),
-            'fuel_id': select_list(fuels, self._api.get_fuels()),
-            'drive_id': select_list(
+            ))
+
+        if opts is not None:
+            self._params = self._params._replace(options=select_list(
+                opts,
+                self._api.get_options(category_id)
+            ))
+
+        if fuels is not None:
+            self._params = self._params._replace(fuel_id=select_list(
+                fuels, self._api.get_fuels()
+            ))
+
+        if drives is not None:
+            self._params = self._params._replace(drive_id=select_list(
                 drives,
                 self._api.get_driver_types(category_id)
-            ),
-            'color_id': select_item(color, self._api.get_colors()),
-            'engineVolume': engine_volume,
-            'seats': seats,
-            'door': doors,
-            'carrying': carrying,
-            'custom': int(custom),
-            'damage': int(damage),
-            'under_credit': int(under_credit),
-            'confiscated_car': int(confiscated),
-            'onRepairParts': int(on_repair_parts),
-        }
+            ))
+
+        if color is not None:
+            self._params = self._params._replace(color_id=select_item(
+                color,
+                self._api.get_colors()
+            ))
 
     def get_average(self) -> dict:
         """Get average price for composed search parameters."""
-        return self._api.average_price(self._params)
+        return self._api.average_price(self._params._asdict())
 
 
 def select_item(item_to_select: str, items_list: list) -> int:
