@@ -314,9 +314,9 @@ class RiaAverageCarPrice:
                  drives: list = None, color: str = None,
                  engine_volume: float = None,
                  seats: int = None, doors: int = None,
-                 carrying: int = None, custom: int = None,
-                 damage: int = None, under_credit: int = None,
-                 confiscated: int = None, on_repair_parts: int = None
+                 carrying: int = None, custom: bool = False,
+                 damage: bool = False, under_credit: bool = False,
+                 confiscated: bool = False, on_repair_parts: bool = False
                  ) -> None:
         """Constructor.
 
@@ -351,11 +351,11 @@ class RiaAverageCarPrice:
             seats - quantity of seats, e.g. 5
             doors - quantity of doors, e.g. 3
             carrying - how much is the car able to carry, e.g. 1500
-            custom - is custom clearance needed for the car? 1 - YES, 0 - NO
-            damage - is the car damaged in car accident? 1 - YES, 0 - NO
-            credit - is the car under credit? 1 - YES, 0 - NO
-            confiscated - is the car confiscated? 1 - YES, 0 - NO
-            on_repair_parts - is the car is broken? 1 - YES, 0 - NO
+            custom - is custom clearance needed for the car?
+            damage - is the car damaged in car accident?
+            credit - is the car under credit?
+            confiscated - is the car confiscated?
+            on_repair_parts - is the car is broken?
         """
         self._api = RiaAPI()
         # Processing required args
