@@ -1,7 +1,6 @@
 requests
 typing # backported python type hints library
 pytest
-pytest-cov
 pytest-greendots
 coverage
 flake8 # lint Python
