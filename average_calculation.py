@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """Python auto.ria.com API.
 
 Python implementation of API intended for calulating
@@ -14,8 +16,11 @@ print(api.get_fuels())
 print(api.get_colors())
 """
 
+from math import ceil
 from pprint import pprint
+
 from autoria.api import RiaAPI, RiaAverageCarPrice
+
 # not implemented yet
 # VEHICLE_MIN_PRICE = '4000'
 # VEHICLE_MAX_PRICE = '5000'
@@ -24,29 +29,42 @@ from autoria.api import RiaAPI, RiaAverageCarPrice
 # the rest of them is optional
 
 api = RiaAPI()
-myCarAveragePrice = RiaAverageCarPrice(
-    category='Легковые',
-    mark='Renault',
-    model='Sceni',
-    # bodystyle=None,
-    # years=[2006, 2007],
-    state='Винницкая',
-    city='Винница',
-    # gears=['Механика'],
-    # opts=['ABS'],
-    # mileage=[10, 200],
-    # fuels=['Дизель'],
-    # drives=['Полный'],
-    # color='Серый',
-    # engine_volume=1.5,
-    # seats=5,
-    # doors=3,
-    # carrying=1500,
-    custom=False,
-    damage=False,
-    under_credit=False,
-    confiscated=False,
-    on_repair_parts=False
-)
+search_params = {
+    'category': 'Легковые',
+    'mark': 'Mazda',
+    'model': 'CX-5',
+    'bodystyle': 'Внедорожник / Кроссовер',
+    'years': [2015, 2017],
+    # 'state': 'Винницкая',
+    # 'city': 'Винница',
+    'gears': ['Автомат'],
+    # 'opts': ['ABS'],
+    # 'mileage': [10, 200],
+    'fuels': ['Дизель'],
+    # 'drives': ['Полный'],
+    # 'color': 'Серый',
+    # 'engine_volume': 1.5,
+    # 'seats': 5,
+    # 'doors': 3,
+    # 'carrying': 1500,
+    'custom': False,
+    'damage': False,
+    'under_credit': False,
+    'confiscated': False,
+    'on_repair_parts': False
+}
 
-pprint(myCarAveragePrice.get_average())
+myCarAveragePrice = RiaAverageCarPrice(**search_params)
+
+base_url = "https://auto.ria.com/auto__{}.html"
+average = myCarAveragePrice.get_average()
+
+report = {
+    'search_params': search_params,
+    'average': average,
+    'classifieds_urls': [
+        ['${}'.format(ceil(price)), base_url.format(item)]
+        for price, item in zip(
+            average.get('prices'), average.get('classifieds'))]
+}
+pprint(report)
