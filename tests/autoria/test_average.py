@@ -33,11 +33,6 @@ class TestAverage:
                      text=json.dumps(ria_driver_types))
             mock.get('/colors',
                      text=json.dumps(ria_colors))
-            # Does it mean that state should be required?
-            # Or we shouldn't try to request cities if state is not set?
-            # 
-            # Actually, both. The state should be required and we shouldn't try
-            # to request cities if we don't have a state.
             mock.get('/states/None/cities',
                      text=json.dumps(ria_cities))
             myCarAveragePrice = RiaAverageCarPrice(

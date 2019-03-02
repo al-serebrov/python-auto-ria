@@ -1,7 +1,6 @@
 .DEFAULT: test
 test:
-	flake8 --append-config=flake8-required.cfg
-	mypy .
+	git diff | flake8 --diff
 	pytest tests
 
 setup:
