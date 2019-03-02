@@ -8,4 +8,3 @@ flake8 # lint Python
 pylint
 mypy
 requests_mock # create mocks for ``requests``
-pytest-catchlog # Capture logging for tests
