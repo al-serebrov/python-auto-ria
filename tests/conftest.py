@@ -119,3 +119,34 @@ def ria_average():
                    12000],
         'total': 8
     }
+
+
+@pytest.fixture()
+def select_data():
+    return [{
+            'name': 'one',
+            'value': 1,
+            }, {
+            'name': 'two',
+            'value': 2,
+            }]
+
+
+@pytest.fixture()
+def list_to_select():
+    return ['Ручная / Механика', 'Автомат']
+
+
+@pytest.fixture()
+def items_list():
+    return [
+                {
+                    'name': "Ручная / Механика",
+                    'value': 1
+                },
+                {
+                    'name': "Автомат",
+                    'value': 2
+                }
+           ]
+  
