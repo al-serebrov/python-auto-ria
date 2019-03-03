@@ -47,11 +47,11 @@ search_params = {
     # 'seats': 5,
     # 'doors': 3,
     # 'carrying': 1500,
-    'custom': False,
-    'damage': False,
-    'under_credit': False,
-    'confiscated': False,
-    'on_repair_parts': False
+    # 'custom': False,
+    # 'damage': False,
+    # 'under_credit': False,
+    # 'confiscated': False,
+    # 'on_repair_parts': False
 }
 
 myCarAveragePrice = RiaAverageCarPrice(**search_params)

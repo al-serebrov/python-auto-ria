@@ -119,3 +119,14 @@ def ria_average():
                    12000],
         'total': 8
     }
+
+
+@pytest.fixture()
+def select_data():
+    return [{
+            'name': 'one',
+            'value': 1,
+            }, {
+            'name': 'two',
+            'value': 2,
+            }]
