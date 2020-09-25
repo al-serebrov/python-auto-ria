@@ -274,6 +274,7 @@ class RiaAPI:
 
 
 RiaAverageCarPriceParams = namedtuple('RiaAverageCarPriceParams', [
+    'api_key',
     'main_category',
     'marka_id',
     'model_id',
@@ -306,7 +307,7 @@ class RiaAverageCarPrice:
     the request for average price is sent using RiaAPI class.
     """
 
-    def __init__(self, category: str, mark: str, model: str,
+    def __init__(self, api_key: str, category: str, mark: str, model: str,
                  bodystyle: str = None, years: list = None,
                  state: str = None, city: str = None,
                  gears: list = None, opts: list = None,
@@ -324,6 +325,7 @@ class RiaAverageCarPrice:
         Acceps the following search parameters.
 
         Args:
+            api_key - your api_key, to get it register on https://developers.ria.com/
             category - vehicle type, e.g. ''Легковые''
             mark - mark, like ''Renault''
             model - model, like ''Scenic''
@@ -372,6 +374,7 @@ class RiaAverageCarPrice:
         # Processing the rest of args, those which are defaulted to None
         # are processed below
         self._params = RiaAverageCarPriceParams(
+            api_key=api_key,
             main_category=category_id,
             marka_id=mark_id,
             model_id=model_id,
@@ -385,15 +388,15 @@ class RiaAverageCarPrice:
             fuel_id=None,
             drive_id=None,
             color_id=None,
-            engineVolume=engine_volume,
-            seats=seats,
-            door=doors,
-            carrying=carrying,
-            custom=custom,
-            damage=damage,
-            under_credit=under_credit,
-            confiscated_car=confiscated,
-            onRepairParts=on_repair_parts,
+            engineVolume=engine_volume if engine_volume else None,
+            seats=seats if seats else None,
+            door=doors if doors else None,
+            carrying=carrying if carrying else None,
+            custom=custom if custom else None,
+            damage=damage if damage else None,
+            under_credit=under_credit if under_credit else None,
+            confiscated_car=confiscated if confiscated else None,
+            onRepairParts=on_repair_parts if on_repair_parts else None,
         )
 
         if state is not None:
