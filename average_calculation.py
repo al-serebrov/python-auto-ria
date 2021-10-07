@@ -58,16 +58,21 @@ search_params = {
 
 myCarAveragePrice = RiaAverageCarPrice(**search_params)
 
-base_url = "https://auto.ria.com/auto__{}.html"
+base_url = "https://auto.ria.com/auto_{}_{}_{}.html"
 average = myCarAveragePrice.get_average()
-search_params.pop('api_key', None)
+search_params.pop("api_key", None)
 
 report = {
-    'search_params': search_params,
-    'average': average,
-    'classifieds_urls': [
-        ['${}'.format(ceil(price)), base_url.format(item)]
-        for price, item in zip(
-            average.get('prices'), average.get('classifieds'))]
+    "search_params": search_params,
+    "average": average,
+    "classifieds_urls": [
+        [
+            "${}".format(ceil(price)),
+            base_url.format(
+                search_params["mark"].lower(), search_params["model"].lower(), item
+            ),
+        ]
+        for price, item in zip(average.get("prices"), average.get("classifieds"))
+    ],
 }
 pprint(report)
